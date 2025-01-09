@@ -1,0 +1,13 @@
+@baseURL = http://localhost:8080/api/v1/auth/
+
+
+### Register
+POST {{baseURL}}/register
+Content-Type: application/json
+
+{
+    "name": "pedro",
+    "email": "pedro@test.com",
+    "password": "password123",
+    "confirmPassword": "password123"
+}

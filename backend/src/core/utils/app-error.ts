@@ -12,7 +12,7 @@ export class AppError extends Error {
   ) {
     super(message);
     this.statusCode = statusCode;
-    (this.errorCode = errorCode),
-      Error.captureStackTrace(this, this.constructor);
+    this.errorCode = errorCode;
+    Error.captureStackTrace(this, this.constructor);
   }
 }

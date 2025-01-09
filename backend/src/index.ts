@@ -7,6 +7,7 @@ import { errorHandler } from "./middlewares/error-handler";
 import { asyncHandler } from "./middlewares/async-handler";
 import { HTTP_STATUS } from "./core/utils/http-status-code";
 import { connectDatabase } from "./db/database";
+import { authRoutes } from "./modules/auth/auth.routes";
 
 const app = express();
 app.use(express.json());
@@ -15,6 +16,8 @@ app.use(cors({ origin: config.APP_ORIGIN, credentials: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(errorHandler);
+
+app.use(`${config.BASE_PATH}/auth`, authRoutes);
 
 app.get(
   "/",

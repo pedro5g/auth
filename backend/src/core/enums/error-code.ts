@@ -10,6 +10,7 @@ export const enum ErrorCode {
   // Access Control Errors
   ACCESS_FORBIDDEN = "ACCESS_FORBIDDEN",
   ACCESS_UNAUTHORIZED = "ACCESS_UNAUTHORIZED",
+  BAD_REQUEST = "BAD_REQUEST",
 
   // Validation and Resource Errors
   VALIDATION_ERROR = "VALIDATION_ERROR",
