@@ -15,7 +15,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ origin: config.APP_ORIGIN, credentials: true }));
 app.use(cookieParser());
 app.use(passport.initialize());
-app.use(errorHandler);
 
 app.use(`${config.BASE_PATH}/auth`, authRoutes);
 
@@ -25,7 +24,7 @@ app.get(
     res.status(HTTP_STATUS.OK).json({ message: "Server is on" });
   })
 );
-
+app.use(errorHandler);
 app.listen(config.PORT, async () => {
   await connectDatabase();
   console.log(

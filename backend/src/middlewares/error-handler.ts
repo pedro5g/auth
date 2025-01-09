@@ -2,6 +2,7 @@ import { ErrorRequestHandler, Response } from "express";
 import { HTTP_STATUS } from "../core/utils/http-status-code";
 import * as z from "zod";
 import { AppError } from "../core/utils/app-error";
+import { clearAuthenticationCookies, REFRESH_PATH } from "../core/utils/cookie";
 
 const formatZodError = (res: Response, error: z.ZodError) => {
   const errors = error.issues.map((err) => ({
@@ -16,6 +17,10 @@ const formatZodError = (res: Response, error: z.ZodError) => {
 
 export const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {
   console.error(`Error on PATH: ${req.path}`, error);
+
+  if (req.path === REFRESH_PATH) {
+    clearAuthenticationCookies(res);
+  }
 
   if (error instanceof SyntaxError) {
     res.status(HTTP_STATUS.BAD_REQUEST).json({
