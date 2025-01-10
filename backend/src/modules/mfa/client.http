@@ -1,0 +1,29 @@
+@baseURL = http://localhost:8080/api/v1/mfa
+// before testing thats routes, going to src/modules/auth/client.http and login in a session 
+
+### Setup
+GET {{baseURL}}/setup
+
+
+### Verify
+POST {{baseURL}}/verify   
+Content-Type: application/json
+
+{
+    "code": "970567",
+    "secretKey": "PI2CUR2JK5SUIVBYFQZDIJRWKIQSC5TSG43TKI3SNNWDQVCXGN3Q"
+}
+
+### login-verify 
+POST {{baseURL}}/verify-login
+Content-Type: application/json
+
+{
+    "code": "139941",
+    "email": "test321@gmail.com"
+}
+
+
+### Revoke 
+PATCH {{baseURL}}/revoke
+Content-Type: application/json

@@ -10,6 +10,7 @@ import { connectDatabase } from "./db/database";
 import { authRoutes } from "./modules/auth/auth.routes";
 import { sessionRoutes } from "./modules/session/session.routes";
 import { authenticateJWT } from "./core/strategies/jwt.strategy";
+import { mfaRoutes } from "./modules/mfa/mfa.routes";
 
 const app = express();
 app.use(express.json());
@@ -20,6 +21,7 @@ app.use(passport.initialize());
 
 app.use(`${config.BASE_PATH}/auth`, authRoutes);
 app.use(`${config.BASE_PATH}/session`, authenticateJWT, sessionRoutes);
+app.use(`${config.BASE_PATH}/mfa`, mfaRoutes);
 
 app.get(
   "/",

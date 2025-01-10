@@ -35,9 +35,16 @@ export class AuthController {
   public login = asyncHandler(async (req, res) => {
     const userAgent = req.headers["user-agent"];
     const body = loginSchema.parse({ ...req.body, userAgent });
-    const { user, accessToken, refreshToken } = await this.authService.login(
-      body
-    );
+    const { user, accessToken, refreshToken, mfaRequired } =
+      await this.authService.login(body);
+
+    if (mfaRequired) {
+      res.status(HTTP_STATUS.OK).json({
+        message: "Verify MFA authentication",
+        mfaRequired,
+        user,
+      });
+    }
 
     setAuthenticationCookies({
       res,
@@ -47,7 +54,8 @@ export class AuthController {
       .status(HTTP_STATUS.OK)
       .json({
         message: "User login successfully",
-        data: { user },
+        mfaRequired,
+        user,
       });
   });
 
