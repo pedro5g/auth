@@ -7,7 +7,7 @@ Content-Type: application/json
 
 {
     "name": "pedro",
-    "email": "pedluiz321@gmail.com",
+    "email": "test321@gmail.com",
     "password": "password123",
     "confirmPassword": "password123"
 }
@@ -17,9 +17,13 @@ POST {{baseURL}}/login
 Content-Type: application/json
 
 {
-    "email": "pedluiz321@gmail.com",
+    "email": "test321@gmail.com",
     "password": "test@123"
 }
+
+### Logout
+POST {{baseURL}}/logout
+Content-Type: application/json 
 
 
 ### Refresh
@@ -40,7 +44,7 @@ POST {{baseURL}}/password/forgot
 Content-Type: application/json
 
 {
-    "email": "pedluiz321@gmail.com"
+    "email": "test321@gmail.com"
 }
 
 ### Reset Password 

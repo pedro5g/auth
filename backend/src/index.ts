@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { config } from "./config/app-config";
-import passport from "passport";
+import { passport } from "./middlewares/passport";
 import { errorHandler } from "./middlewares/error-handler";
 import { asyncHandler } from "./middlewares/async-handler";
 import { HTTP_STATUS } from "./core/utils/http-status-code";

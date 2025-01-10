@@ -1,4 +1,7 @@
-import { UnauthorizedException } from "../../core/utils/catch-errors";
+import {
+  NotFoundException,
+  UnauthorizedException,
+} from "../../core/utils/catch-errors";
 import {
   clearAuthenticationCookies,
   getAccessTokenCookieOptions,
@@ -93,5 +96,17 @@ export class AuthController {
     clearAuthenticationCookies(res).status(HTTP_STATUS.OK).json({
       message: "Reset password successfully",
     });
+  });
+
+  public logout = asyncHandler(async (req, res) => {
+    const sessionId = req.sessionId;
+
+    if (!sessionId) {
+      throw new NotFoundException("Session is invalid");
+    }
+    await this.authService.logout(sessionId);
+    clearAuthenticationCookies(res)
+      .status(HTTP_STATUS.OK)
+      .json({ message: "User logout successfully" });
   });
 }
