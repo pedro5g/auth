@@ -102,7 +102,7 @@ export function calculateExpirationDate(expiresIn: string): Date {
 
 /**
  *
- * @returns returns a Date contains an hour starting to current time
+ * @returns returns a Date contains an hour increase to current time
  */
 export function anHourFromNow() {
   const now = new Date();

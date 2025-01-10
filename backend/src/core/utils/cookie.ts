@@ -35,6 +35,16 @@ export function getAccessTokenCookieOptions(): CookieOptions {
   };
 }
 
+/**
+ * decorate express response, applying all cookies in response
+ *
+ *
+ * @param param0 res - Express Response
+ * @param param1 accessToken - String
+ * @param param2 refreshToken - String
+ *
+ * @returns returns response decorated with cookies
+ */
 export function setAuthenticationCookies({
   res,
   accessToken,
@@ -45,6 +55,12 @@ export function setAuthenticationCookies({
   return res;
 }
 
+/**
+ * remove all request cookies
+ *
+ * @param res - Express Response
+ * @returns returns response without cookies
+ */
 export function clearAuthenticationCookies(res: Response) {
   return res.clearCookie("accessToken").clearCookie("refreshToken", {
     path: REFRESH_PATH,
