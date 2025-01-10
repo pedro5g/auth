@@ -61,6 +61,20 @@ export function minutesFromNow(minutes: number = 45): Date {
 
   return add(now, { minutes });
 }
+
+/**
+ * utility function to decrease minutes to current date
+ *
+ * @param   minutes Number
+ * @returns returns a Date contain the current minutes decrease with the minutes quantity passed by params
+ */
+
+export function minutesAgo(minutes: number = 3): Date {
+  const now = new Date();
+
+  return add(now, { minutes: -minutes });
+}
+
 /**
  *
  * @param expiresIn - receives JWT expiresIn text format ("15m", "1h", or "2d")
@@ -85,3 +99,15 @@ export function calculateExpirationDate(expiresIn: string): Date {
       throw new Error('Invalid unit. Use "m", "h", or "d".');
   }
 }
+
+/**
+ *
+ * @returns returns a Date contains an hour starting to current time
+ */
+export function anHourFromNow() {
+  const now = new Date();
+  return add(now, { hours: 1 });
+}
+
+/** contains value of one day in milliseconds */
+export const ONE_DAY_IN_MS = 24 * 60 * 60 * 1000;

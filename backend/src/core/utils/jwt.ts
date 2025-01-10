@@ -40,3 +40,18 @@ export const signJwtToken = (
     ...opts,
   });
 };
+
+export const verifyJwtToken = <T extends object = AccessTokenPayload>(
+  token: string,
+  options?: VerifyOptions & { secret: string }
+) => {
+  try {
+    const { secret = config.JWT.SECRET, ...opts } = options || {};
+    const payload = jwt.verify(token, secret, { ...defaults, ...opts }) as T;
+    return { payload };
+  } catch (e: any) {
+    return {
+      error: e.message,
+    };
+  }
+};

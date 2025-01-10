@@ -1,4 +1,4 @@
-@baseURL = http://localhost:8080/api/v1/auth/
+@baseURL = http://localhost:8080/api/v1/auth
 
 
 ### Register
@@ -7,7 +7,7 @@ Content-Type: application/json
 
 {
     "name": "pedro",
-    "email": "pedro@test.com",
+    "email": "pedluiz321@gmail.com",
     "password": "password123",
     "confirmPassword": "password123"
 }
@@ -17,6 +17,37 @@ POST {{baseURL}}/login
 Content-Type: application/json
 
 {
-    "email": "pedro@test.com",
-    "password": "password123"
+    "email": "pedluiz321@gmail.com",
+    "password": "test@123"
+}
+
+
+### Refresh
+GET {{baseURL}}/refresh 
+
+
+### Verify email 
+POST {{baseURL}}/verify/email
+Content-Type: application/json
+
+{
+    "code": "b0cc712557b64562bf6959473"
+}
+
+
+### Forgot Password 
+POST {{baseURL}}/password/forgot
+Content-Type: application/json
+
+{
+    "email": "pedluiz321@gmail.com"
+}
+
+### Reset Password 
+POST {{baseURL}}/password/rest
+Content-Type: application/json
+
+{
+    "password": "test@123",
+    "verificationCode": "4c9043ad29ab4a5c9501b72c1"
 }
