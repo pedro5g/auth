@@ -13,7 +13,7 @@ API.interceptors.response.use(
     return response;
   },
   (error) => {
-    const { data, status } = error?.response;
+    const { data, status } = error?.response || {};
 
     if (data === "Unauthorized" && status === 401) {
     }
