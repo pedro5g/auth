@@ -8,7 +8,7 @@ authRoutes.post("/register", authController.register);
 authRoutes.post("/login", authController.login);
 authRoutes.post("/verify/email", authController.veryEmail);
 authRoutes.post("/password/forgot", authController.forgotPassword);
-authRoutes.post("/password/rest", authController.resetPassword);
+authRoutes.post("/password/reset", authController.resetPassword);
 authRoutes.post("/logout", authenticateJWT, authController.logout);
 
 authRoutes.get("/refresh", authController.refreshToken);

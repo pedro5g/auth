@@ -48,7 +48,7 @@ Content-Type: application/json
 }
 
 ### Reset Password 
-POST {{baseURL}}/password/rest
+POST {{baseURL}}/password/reset
 Content-Type: application/json
 
 {
