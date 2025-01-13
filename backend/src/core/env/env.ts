@@ -5,7 +5,7 @@ config();
 const envSchema = z.object({
   PORT: z.coerce.number().default(8080),
   ENV_NODE: z.enum(["dev", "prod", "test"]).default("dev"),
-  MONOGO_URI: z.string(),
+  MONGO_URI: z.string(),
   BASE_PATH: z.string(),
   APP_ORIGIN: z.string().url(),
   JWT_SECRET: z.string(),

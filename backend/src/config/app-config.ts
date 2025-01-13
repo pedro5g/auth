@@ -5,7 +5,7 @@ const appConfig = () => ({
   APP_ORIGIN: getEnv("APP_ORIGIN"),
   PORT: getEnv("PORT"),
   BASE_PATH: getEnv("BASE_PATH"),
-  MONGO_URI: getEnv("MONOGO_URI"),
+  MONGO_URI: getEnv("MONGO_URI"),
   JWT: {
     SECRET: getEnv("JWT_SECRET"),
     EXPIRES_IN: getEnv("JWT_EXPIRES_IN"),
