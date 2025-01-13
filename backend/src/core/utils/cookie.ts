@@ -19,20 +19,12 @@ const defaults: CookieOptions = {
 export function getRefreshTokenCookieOptions(): CookieOptions {
   const expiresIn = config.JWT.REFRESH_EXPIRES_IN;
   const expires = calculateExpirationDate(expiresIn);
-  return {
-    ...defaults,
-    expires,
-    path: REFRESH_PATH,
-  };
+  return { ...defaults, expires, path: "/" };
 }
 export function getAccessTokenCookieOptions(): CookieOptions {
   const expiresIn = config.JWT.EXPIRES_IN;
   const expires = calculateExpirationDate(expiresIn);
-  return {
-    ...defaults,
-    expires,
-    path: "/",
-  };
+  return { ...defaults, expires, path: "/" };
 }
 
 /**
@@ -50,9 +42,9 @@ export function setAuthenticationCookies({
   accessToken,
   refreshToken,
 }: CookiePayload): Response {
-  res.cookie("accessToken", accessToken).cookie("refreshToken", refreshToken);
-
-  return res;
+  return res
+    .cookie("accessToken", accessToken, getAccessTokenCookieOptions())
+    .cookie("refreshToken", refreshToken, getRefreshTokenCookieOptions());
 }
 
 /**
