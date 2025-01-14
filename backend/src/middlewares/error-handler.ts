@@ -16,7 +16,7 @@ const formatZodError = (res: Response, error: z.ZodError) => {
 };
 
 export const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {
-  console.error(`Error on PATH: ${req.path}`, error);
+  console.error(`Error on PATH: ${req.path}`);
 
   if (req.path === REFRESH_PATH) {
     clearAuthenticationCookies(res);

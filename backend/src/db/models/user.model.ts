@@ -1,6 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { comparPassword, hashPassword } from "../../core/utils/bcrypt";
-import { boolean } from "zod";
 
 interface UserPreferences {
   enable2FA: boolean;

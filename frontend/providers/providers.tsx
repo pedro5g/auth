@@ -1,3 +1,4 @@
+"use client";
 import { Toaster } from "@/components/ui/toaster";
 import { QueryProvider } from "./query-provider";
 import { ThemeProvider } from "./theme-provider";

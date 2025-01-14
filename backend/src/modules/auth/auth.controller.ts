@@ -12,6 +12,7 @@ import { HTTP_STATUS } from "../../core/utils/http-status-code";
 import {
   emailSchema,
   loginSchema,
+  magicAuthenticateSchema,
   registerSchema,
   resetPasswordSchema,
   verificationEmailSchema,
@@ -116,5 +117,38 @@ export class AuthController {
     clearAuthenticationCookies(res)
       .status(HTTP_STATUS.OK)
       .json({ message: "User logout successfully" });
+  });
+
+  public loginByMagicLink = asyncHandler(async (req, res) => {
+    const email = emailSchema.parse(req.body.email);
+
+    const { message } = await this.authService.loginByMagicLink(email);
+
+    res.status(HTTP_STATUS.OK).json({ message: message });
+  });
+
+  public magicAuthenticate = asyncHandler(async (req, res) => {
+    const userAgent = req.headers["user-agent"];
+    const { redirect, ...data } = magicAuthenticateSchema.parse({
+      ...req.query,
+      userAgent,
+    });
+
+    const { mfaRequired, accessToken, refreshToken, email } =
+      await this.authService.magicAuthenticate(data);
+
+    if (mfaRequired) {
+      res
+        .status(HTTP_STATUS.REDIRECT)
+        .redirect(redirect.concat(`/verify-mfa?email=${email}`));
+    }
+
+    setAuthenticationCookies({
+      res,
+      accessToken,
+      refreshToken,
+    })
+      .status(HTTP_STATUS.REDIRECT)
+      .redirect(redirect.concat("/home"));
   });
 }

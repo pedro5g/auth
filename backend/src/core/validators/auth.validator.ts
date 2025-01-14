@@ -30,3 +30,9 @@ export const resetPasswordSchema = z.object({
   password: passwordSchema,
   verificationCode: verificationCodeSchema,
 });
+
+export const magicAuthenticateSchema = z.object({
+  code: z.string().trim().min(1).max(25),
+  redirect: z.string(),
+  userAgent: z.string().optional(),
+});

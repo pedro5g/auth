@@ -7,6 +7,7 @@ export const HTTP_STATUS = {
   ACCEPTED: 202,
   NO_CONTENT: 204,
   // Client error responses
+  REDIRECT: 301,
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,

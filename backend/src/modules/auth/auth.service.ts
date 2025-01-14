@@ -3,6 +3,7 @@ import { ErrorCode } from "../../core/enums/error-code";
 import { VerificationEnum } from "../../core/enums/verification-enum";
 import {
   LoginDto,
+  MagicAuthenticateDto,
   RegisterDto,
   ResetPasswordDto,
 } from "../../core/interface/auth.interface";
@@ -28,11 +29,14 @@ import {
   signJwtToken,
   verifyJwtToken,
 } from "../../core/utils/jwt";
+import { generateUniqueCode } from "../../core/utils/uuid";
+import { AuthLinkModel } from "../../db/models/auth-link.model";
 import { SessionModel } from "../../db/models/session.model";
-import { UserModel } from "../../db/models/user.model";
+import { UserDocument, UserModel } from "../../db/models/user.model";
 import { VerificationCodeModel } from "../../db/models/verification.model";
 import { sendEmail } from "../../mailers/mailer";
 import {
+  magicLinkAuthenticationTemplate,
   passwordResetTemplate,
   verifyEmailTemplate,
 } from "../../mailers/templates/template";
@@ -84,6 +88,10 @@ export class AuthService {
         "Invalid email or password",
         ErrorCode.AUTH_USER_NOT_FOUND
       );
+    }
+
+    if (!user.isEmailVerified) {
+      await this.resendVerificationEmail(user);
     }
 
     const passwordMatch = await user.comparePassword(password);
@@ -219,6 +227,10 @@ export class AuthService {
       throw new NotFoundException("User not found");
     }
 
+    if (!user.isEmailVerified) {
+      await this.resendVerificationEmail(user);
+    }
+
     const timeAgo = minutesAgo(3); // 3 minutes ago
     const maxAttempts = 2;
 
@@ -295,5 +307,131 @@ export class AuthService {
 
   public async logout(sessionId: string) {
     return await SessionModel.findByIdAndDelete(sessionId);
+  }
+
+  public async loginByMagicLink(email: string) {
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      throw new NotFoundException("Invalid email address");
+    }
+
+    let authCode: string;
+    const authLinkOnDatabase = await AuthLinkModel.findOne({
+      userId: user._id,
+      expiredAt: { $gt: new Date() },
+    });
+
+    if (authLinkOnDatabase) {
+      authCode = authLinkOnDatabase.code;
+    } else {
+      authCode = generateUniqueCode();
+      await AuthLinkModel.create({
+        userId: user._id,
+        code: authCode,
+        expiredAt: minutesFromNow(10),
+      });
+    }
+
+    const authLink = new URL(
+      "api/v1/auth/magic/authenticate",
+      config.API_BASE_URL
+    );
+    authLink.searchParams.set("code", authCode);
+    authLink.searchParams.set("redirect", config.APP_ORIGIN);
+
+    const { error } = await sendEmail({
+      ...magicLinkAuthenticationTemplate(authLink.toString()),
+      to: user.email,
+    });
+
+    return {
+      message: error
+        ? "Oops, something were wrong to try send magic link"
+        : "Authentication link sent successfully, check your email",
+    };
+  }
+
+  public async magicAuthenticate({ code, userAgent }: MagicAuthenticateDto) {
+    const authLink = await AuthLinkModel.findOne({
+      code,
+      expiredAt: { $gt: new Date() },
+    });
+
+    if (!authLink) {
+      throw new BadRequestException("Invalid or expired magic link");
+    }
+
+    const user = await UserModel.findOne({ _id: authLink.userId });
+
+    if (!user) {
+      throw new NotFoundException("User not fond");
+    }
+
+    if (user.userPreferences.enable2FA) {
+      await authLink.deleteOne();
+      return {
+        mfaRequired: true,
+        email: user.email,
+        accessToken: "",
+        refreshToken: "",
+      };
+    }
+
+    const session = await SessionModel.create({
+      userId: user._id,
+      userAgent,
+    });
+
+    const accessToken = signJwtToken({
+      userId: user._id,
+      sessionId: session._id,
+    });
+    const refreshToken = signJwtToken(
+      {
+        sessionId: session._id,
+      },
+      refreshTokenSignOptions
+    );
+
+    await authLink.deleteOne();
+
+    return {
+      accessToken,
+      refreshToken,
+      mfaRequired: false,
+    };
+  }
+
+  private async resendVerificationEmail(user: UserDocument) {
+    let verification = await VerificationCodeModel.findOne({
+      userId: user._id,
+    });
+
+    const verificationURL = `${config.APP_ORIGIN}/confirm-account?code=`;
+
+    if (
+      verification &&
+      verification.expiresAt.getTime() < new Date().getTime()
+    ) {
+      verificationURL.concat(verification.code);
+    } else {
+      verification = await VerificationCodeModel.create({
+        userId: user._id,
+        type: VerificationEnum.EMAIL_VERIFICATION,
+        expiresAt: minutesFromNow(45),
+      });
+      verificationURL.concat(verification.code);
+    }
+
+    await sendEmail({
+      to: user.email,
+      ...verifyEmailTemplate(verificationURL),
+    });
+
+    throw new BadRequestException(
+      "Email does not verified, please verify your email",
+      ErrorCode.VERIFICATION_ERROR
+    );
   }
 }

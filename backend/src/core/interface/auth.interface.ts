@@ -15,3 +15,8 @@ export interface ResetPasswordDto {
   password: string;
   verificationCode: string;
 }
+
+export interface MagicAuthenticateDto {
+  code: string;
+  userAgent?: string;
+}
