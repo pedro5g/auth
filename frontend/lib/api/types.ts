@@ -5,6 +5,11 @@ export type ResetPasswordType = { password: string; verificationCode: string };
 export type VerifyEmailType = { code: string };
 export type VerifyMFAType = { code: string; secretKey: string };
 export type MFALoginType = { code: string; email: string };
+export type VerifyMFAReturnType = { message: string };
+export type RevokeMFAReturnType = { message: string };
+export type UserSessionQueryReturnType = { user: UserType };
+export type LoginByMagicLink = { email: string };
+export type LoginByMagicLinkResponseType = { message: string };
 
 export type LoginType = {
   email: string;
@@ -31,9 +36,20 @@ export type SessionType = {
   isCurrent: boolean;
 };
 
+export type UserType = {
+  name: string;
+  email: string;
+  isEmailVerified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  userPreferences: {
+    enable2FA: boolean;
+  };
+};
+
 export type SessionResponseType = {
   message: string;
-  session: SessionType[];
+  sessions: SessionType[];
 };
 
 export type MFAType = {

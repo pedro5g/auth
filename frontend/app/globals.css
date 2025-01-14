@@ -13,6 +13,16 @@ body {
   }
 }
 
+.steps-gradient {
+  background: linear-gradient(
+    180deg,
+    transparent 0,
+    #00002f26 10%,
+    #00002f26 90%,
+    transparent 100%
+  );
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

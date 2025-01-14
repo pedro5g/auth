@@ -2,14 +2,19 @@ import { API } from "./axios";
 import { AxiosAdapter, CreateHttpClientAdapter } from "./request-adapter";
 import {
   ForgotPasswordType,
+  LoginByMagicLink,
+  LoginByMagicLinkResponseType,
   LoginResponseType,
   LoginType,
   MFALoginType,
   MFAType,
   RegisterType,
   ResetPasswordType,
+  RevokeMFAReturnType,
   SessionResponseType,
+  UserSessionQueryReturnType,
   VerifyEmailType,
+  VerifyMFAReturnType,
   VerifyMFAType,
 } from "./types";
 
@@ -17,6 +22,9 @@ export const api = CreateHttpClientAdapter(AxiosAdapter(API));
 
 export const loginMutationFn = async (data: LoginType) =>
   await api.POST<LoginResponseType>("/auth/login", data);
+
+export const loginByMagicLink = async (data: LoginByMagicLink) =>
+  await api.POST<LoginByMagicLinkResponseType>("/auth/magic", data);
 
 export const registerMutationFn = async (data: RegisterType) =>
   await api.POST("/auth/register", data);
@@ -31,7 +39,7 @@ export const resetPasswordMutationFn = async (data: ResetPasswordType) =>
   await api.POST(`/auth/password/reset`, data);
 
 export const verifyMFALoginMutationFn = async (data: MFALoginType) =>
-  await api.POST(`/mfa/verify-login`, data);
+  await api.POST<VerifyMFAReturnType>(`/mfa/verify-login`, data);
 
 export const logoutMutationFn = async () => await api.POST(`/auth/logout`);
 
@@ -40,11 +48,13 @@ export const mfaSetupQueryFn = async () => {
 };
 
 export const verifyMFAMutationFn = async (data: VerifyMFAType) =>
-  await api.POST(`/mfa/verify`, data);
+  await api.POST<VerifyMFAReturnType>(`/mfa/verify`, data);
 
-export const revokeMFAMutationFn = async () => await api.PATCH(`/mfa/revoke`);
+export const revokeMFAMutationFn = async () =>
+  await api.PATCH<RevokeMFAReturnType>(`/mfa/revoke`);
 
-export const getUserSessionQueryFn = async () => await api.GET(`/session/`);
+export const getUserSessionQueryFn = async () =>
+  await api.GET<UserSessionQueryReturnType>(`/session`);
 
 export const sessionsQueryFn = async () => {
   return await api.GET<SessionResponseType>(`/session/all`);

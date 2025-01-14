@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Loader, MailCheckIcon } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { useMutation } from "@tanstack/react-query";
-import { registerMutationFn } from "@/lib/api/api";
+import { loginByMagicLink, registerMutationFn } from "@/lib/api/api";
 import { toast } from "@/hooks/use-toast";
 
 const formSchema = z
@@ -48,6 +48,9 @@ export const SignupForm = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: registerMutationFn,
   });
+  const { mutate: magicLogin, isPending: isMagicPending } = useMutation({
+    mutationFn: loginByMagicLink,
+  });
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -66,6 +69,30 @@ export const SignupForm = () => {
       },
       onError: (error) => {
         console.log(error);
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  const onMagicLogin = (value: { email: string }) => {
+    if (!value.email) {
+      form.setError("email", { message: "Please, give a valid email" });
+      return;
+    }
+
+    magicLogin(value, {
+      onSuccess: (response) => {
+        form.clearErrors("email");
+        toast({
+          title: "Successfully",
+          description: response.message,
+        });
+      },
+      onError: (error) => {
         toast({
           title: "Error",
           description: error.message,
@@ -104,7 +131,7 @@ export const SignupForm = () => {
                           Name
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="typingyournameee" {...field} />
+                          <Input placeholder="typing your name..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -121,10 +148,7 @@ export const SignupForm = () => {
                           Email
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="subscribeto@channel.com"
-                            {...field}
-                          />
+                          <Input placeholder="@gmail.com..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -175,7 +199,7 @@ export const SignupForm = () => {
                 </div>
                 <Button
                   className="w-full text-[15px] h-[40px] !bg-blue-500 text-white font-semibold"
-                  disabled={isPending}
+                  disabled={isPending || isMagicPending}
                   type="submit">
                   {isPending && <Loader className="animate-spin" />}
                   Create account
@@ -199,7 +223,12 @@ export const SignupForm = () => {
                 </div>
               </form>
             </Form>
-            <Button variant="outline" className="w-full h-[40px]">
+            <Button
+              disabled={isPending || isMagicPending}
+              onClick={() => onMagicLogin({ email: form.getValues("email") })}
+              variant="outline"
+              className="w-full h-[40px]">
+              {isMagicPending && <Loader className="animate-spin" />}
               Email magic link
             </Button>
             <p className="text-xs font-normal mt-4">

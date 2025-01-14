@@ -19,7 +19,7 @@ import { Logo } from "@/components/logo";
 
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
-import { loginMutationFn } from "@/lib/api/api";
+import { loginByMagicLink, loginMutationFn } from "@/lib/api/api";
 
 const formSchema = z.object({
   email: z.string().trim().email().min(1, {
@@ -34,8 +34,11 @@ type LoginFromSchema = z.infer<typeof formSchema>;
 
 export default function LoginForm() {
   const router = useRouter();
-  const { mutate, isPending } = useMutation({
+  const { mutate: loginMutation, isPending } = useMutation({
     mutationFn: loginMutationFn,
+  });
+  const { mutate: magicLogin, isPending: isMagicPending } = useMutation({
+    mutationFn: loginByMagicLink,
   });
 
   const form = useForm<LoginFromSchema>({
@@ -47,13 +50,37 @@ export default function LoginForm() {
   });
 
   const onSubmit = (values: LoginFromSchema) => {
-    mutate(values, {
+    loginMutation(values, {
       onSuccess: (response) => {
         if (response.mfaRequired) {
           router.replace(`/verify-mfa?email=${values.email}`);
           return;
         }
         router.replace(`/home`);
+      },
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      },
+    });
+  };
+
+  const onMagicLogin = (value: { email: string }) => {
+    if (!value.email) {
+      form.setError("email", { message: "Please, give a valid email" });
+      return;
+    }
+
+    magicLogin(value, {
+      onSuccess: (response) => {
+        form.clearErrors("email");
+        toast({
+          title: "Successfully",
+          description: response.message,
+        });
       },
       onError: (error) => {
         toast({
@@ -92,7 +119,7 @@ export default function LoginForm() {
                       Email
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="subscribeto@channel.com" {...field} />
+                      <Input placeholder="@gmail.com..." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -125,7 +152,7 @@ export default function LoginForm() {
             </div>
             <Button
               className="w-full text-[15px] h-[40px] text-white font-semibold"
-              disabled={isPending}
+              disabled={isPending || isMagicPending}
               type="submit">
               {isPending && <Loader className="animate-spin" />}
               Sign in
@@ -149,7 +176,12 @@ export default function LoginForm() {
             </div>
           </form>
         </Form>
-        <Button variant="outline" className="w-full h-[40px]">
+        <Button
+          disabled={isPending || isMagicPending}
+          onClick={() => onMagicLogin({ email: form.getValues("email") })}
+          variant="outline"
+          className="w-full h-[40px]">
+          {isMagicPending && <Loader className="animate-spin" />}
           Email magic link
         </Button>
         <p className="text-xs dark:text-slate- font-normal mt-7">
