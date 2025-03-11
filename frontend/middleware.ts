@@ -17,23 +17,10 @@ export default async function middleware(request: NextRequest) {
   const hasAccessToken = request.cookies.has("accessToken");
   const hasRefreshToken = request.cookies.has("refreshToken");
 
-  if (
-    isProtectedRoute &&
-    !hasAccessToken &&
-    (hasRefreshToken || !hasRefreshToken)
-  ) {
+  if (isProtectedRoute && !hasAccessToken) {
     if (hasRefreshToken) {
       // try getting a new access token
-      try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/refresh`, {
-          method: "GET",
-          credentials: "include",
-        });
-
-        return NextResponse.next();
-      } catch (e) {
-        return NextResponse.redirect(new URL("/", request.nextUrl));
-      }
+      return NextResponse.next();
     }
     return NextResponse.redirect(new URL("/", request.nextUrl));
   }
@@ -41,6 +28,5 @@ export default async function middleware(request: NextRequest) {
   if (isPublicRoute && hasAccessToken) {
     return NextResponse.redirect(new URL("/home", request.nextUrl));
   }
-
   return NextResponse.next();
 }
